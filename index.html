@@ -2,50 +2,86 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WASABI - Galaxy XR Lens QR Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WASABI 3D - XR QR</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --wasabi: #83d644; --bg: #121212; --card: #1e1e1e; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: #fff; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .container { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
-        h2 { text-align: center; color: var(--wasabi); font-weight: 700; margin-bottom: 5px; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; 
+            background: var(--bg); color: #fff; margin: 0;
+            display: flex; justify-content: center;
+            min-height: 100vh; padding: 20px 15px; box-sizing: border-box;
+        }
+
+        .container { 
+            width: 100%; max-width: 450px; /* 모바일 폭에 최적화 */
+            background: var(--card); padding: 25px 20px; border-radius: 24px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #333;
+        }
+
+        h2 { text-align: center; color: var(--wasabi); font-size: 24px; margin: 0 0 5px 0; letter-spacing: -0.5px; }
         .sub-title { text-align: center; font-size: 13px; color: #888; margin-bottom: 25px; }
-        .eye-section { background: #2a2a2a; padding: 18px; border-radius: 12px; margin-bottom: 15px; }
-        .eye-label { font-size: 14px; font-weight: bold; color: var(--wasabi); margin-bottom: 12px; display: block; border-left: 4px solid var(--wasabi); padding-left: 8px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        .eye-section { background: #2a2a2a; padding: 20px; border-radius: 16px; margin-bottom: 15px; }
+        .eye-label { font-size: 14px; font-weight: bold; color: var(--wasabi); margin-bottom: 15px; display: block; }
+        
+        /* 모바일에서 입력하기 편하게 그리드 조정 */
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .input-box { display: flex; flex-direction: column; }
-        label { font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
-        input { background: #333; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; text-align: center; font-size: 14px; }
-        input:focus { border-color: var(--wasabi); outline: none; }
-        .btn { width: 100%; padding: 16px; background: var(--wasabi); color: #000; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn:hover { background: #72ba3a; }
-        #qr-area { background: #fff; padding: 25px; border-radius: 15px; margin-top: 25px; display: none; flex-direction: column; align-items: center; }
-        #qr-area p { color: #000; font-size: 12px; margin-top: 15px; font-weight: bold; }
-        .footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; line-height: 1.6; }
+        label { font-size: 10px; color: #999; margin-bottom: 6px; text-align: center; font-weight: bold; }
+        
+        /* 모바일 터치 영역 확대를 위해 input 크기 키움 */
+        input { 
+            background: #333; border: 1px solid #444; color: white; 
+            padding: 15px 0; border-radius: 10px; text-align: center; 
+            font-size: 18px; /* 숫자 크게 */
+            font-weight: 600; appearance: none; -webkit-appearance: none;
+        }
+        input:focus { border-color: var(--wasabi); outline: none; background: #3d3d3d; }
+
+        /* 생성 버튼을 모바일 화면 하단에 가깝게 크게 제작 */
+        .btn { 
+            width: 100%; padding: 20px; background: var(--wasabi); color: #000; border: none; 
+            border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; 
+            margin-top: 10px; transition: 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.96); background: #72ba3a; }
+
+        #qr-area { background: #fff; padding: 25px; border-radius: 20px; margin-top: 30px; display: none; flex-direction: column; align-items: center; }
+        #qr-area p { color: #000; font-size: 14px; margin-top: 15px; font-weight: bold; }
+
+        /* 가이드 카드 최적화 */
+        .guide-card { margin-top: 35px; border-top: 1px solid #333; padding-top: 25px; }
+        .guide-title { font-size: 16px; color: var(--wasabi); font-weight: bold; margin-bottom: 15px; }
+        .guide-step { font-size: 14px; color: #bbb; margin-bottom: 14px; line-height: 1.5; display: flex; align-items: flex-start; }
+        .step-num { color: var(--wasabi); font-weight: bold; margin-right: 10px; min-width: 18px; }
+
+        .footer { text-align: center; font-size: 12px; color: #555; margin-top: 30px; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Wasabi 3D</h2>
+    <h2>WASABI 3D</h2>
     <div class="sub-title">Galaxy XR Lens QR Generator</div>
     
     <div class="eye-section">
         <span class="eye-label">LEFT EYE (왼쪽)</span>
         <div class="grid">
-            <div class="input-box"><label>SPH</label><input type="number" id="LS" step="0.25" value="0.00"></div>
-            <div class="input-box"><label>CYL</label><input type="number" id="LC" step="0.25" value="0.00"></div>
-            <div class="input-box"><label>AXIS</label><input type="number" id="LA" value="180"></div>
+            <div class="input-box"><label>SPH</label><input type="number" id="LS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="LC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="LA" value="180" inputmode="numeric"></div>
         </div>
     </div>
 
     <div class="eye-section">
         <span class="eye-label">RIGHT EYE (오른쪽)</span>
         <div class="grid">
-            <div class="input-box"><label>SPH</label><input type="number" id="RS" step="0.25" value="0.00"></div>
-            <div class="input-box"><label>CYL</label><input type="number" id="RC" step="0.25" value="0.00"></div>
-            <div class="input-box"><label>AXIS</label><input type="number" id="RA" value="180"></div>
+            <div class="input-box"><label>SPH</label><input type="number" id="RS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="RC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="RA" value="180" inputmode="numeric"></div>
         </div>
     </div>
 
@@ -53,12 +89,18 @@
 
     <div id="qr-area">
         <div id="qrcode"></div>
-        <p>기기의 카메라로 스캔하세요</p>
+        <p>기기로 이 QR을 스캔하세요</p>
+    </div>
+
+    <div class="guide-card">
+        <div class="guide-title">📱 QR 등록 방법</div>
+        <div class="guide-step"><span class="step-num">1.</span><span>XR 착용 후 <b>설정</b> 메뉴를 엽니다.</span></div>
+        <div class="guide-step"><span class="step-num">2.</span><span><b>입력 → 시선 보정 → 시력 렌즈</b>로 이동합니다.</span></div>
+        <div class="guide-step"><span class="step-num">3.</span><span><b>새 렌즈 추가</b> 선택 후 QR을 비춰주세요.</span></div>
     </div>
 
     <div class="footer">
-        본 서비스는 갤럭시 XR 렌즈 보정을 위한 전용 규격을 준수합니다.<br>
-        데이터는 암호화(Base64)되어 기기에 전달됩니다.
+        © 2026 WASABI 3D. <br>국내 최대 VR 액세서리 제작자
     </div>
 </div>
 
@@ -69,7 +111,6 @@
         qrcodeDiv.innerHTML = "";
         qrContainer.style.display = "flex";
 
-        // 1. 값 추출 (기본값 처리)
         const getVal = (id) => document.getElementById(id).value || "0";
         
         const LS = parseFloat(getVal('LS'));
@@ -79,27 +120,21 @@
         const RC = parseFloat(getVal('RC'));
         const RA = parseInt(getVal('RA'));
 
-        // 2. 엄격한 JSON 문자열 조립 (순서 및 공백 제어)
-        // 자바스크립트 객체의 불확실성을 피하기 위해 수동 조립
         const strictJson = '{"LS":' + LS + ',"LC":' + LC + ',"LA":' + LA + ',"RS":' + RS + ',"RC":' + RC + ',"RA":' + RA + '}';
-
-        // 3. 헤더 #tB 추가 및 Base64 인코딩
-        const rawContent = "#tB" + strictJson;
-        const base64Str = btoa(rawContent);
-
-        // 4. 최종 배열 패키징 (공백 없이 구성)
+        const base64Str = btoa("#tB" + strictJson);
         const finalPayload = '["I610_EL","1","' + base64Str + '"]';
 
-        // 5. QR 생성
         new QRCode(qrcodeDiv, {
             text: finalPayload,
-            width: 200,
-            height: 200,
-            correctLevel : QRCode.CorrectLevel.H // 가장 높은 오류 정정 수준
+            width: 220,
+            height: 220,
+            correctLevel : QRCode.CorrectLevel.H
         });
         
-        // 화면 하단으로 자동 스크롤
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        // 생성 후 자동으로 QR 위치로 스크롤
+        setTimeout(() => {
+            qrContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     }
 </script>
 </body>
