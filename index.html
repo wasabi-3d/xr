@@ -62,4 +62,84 @@
         .guide-step { font-size: 13px; color: #bbb; margin-bottom: 12px; line-height: 1.6; display: flex; text-align: left; }
         .step-num { color: var(--wasabi); font-weight: bold; margin-right: 8px; min-width: 15px; }
 
-        .footer { text-align: center; font-size: 11px;
+        .footer { text-align: center; font-size: 11px; color: #555; margin-top: 25px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>WASABI 3D</h2>
+    <div class="sub-title">Galaxy XR Lens QR Generator</div>
+    
+    <div class="eye-section">
+        <span class="eye-label">LEFT EYE (왼쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH</label><input type="number" id="LS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="LC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="LA" value="180" inputmode="numeric"></div>
+        </div>
+    </div>
+
+    <div class="eye-section">
+        <span class="eye-label">RIGHT EYE (오른쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH</label><input type="number" id="RS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="RC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="RA" value="180" inputmode="numeric"></div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="generateStrictQR()">QR 코드 생성하기</button>
+
+    <div id="qr-area">
+        <div id="qrcode"></div>
+        <p>카메라로 위 QR을 스캔하세요</p>
+    </div>
+
+    <div class="guide-card">
+        <div class="guide-title">📋 시력 QR 코드 등록법</div>
+        <div class="guide-step"><span class="step-num">1.</span><span>핸드폰이나 PC로 시력 정보가 담긴 QR을 생성합니다.</span></div>
+        <div class="guide-step"><span class="step-num">2.</span><span>XR을 착용하고 <b>입력 → 시선 보정 → 시력 렌즈</b>로 이동합니다.</span></div>
+        <div class="guide-step"><span class="step-num">3.</span><span><b>새 렌즈 추가</b>하고 QR코드를 카메라에 맞춰 주세요.</span></div>
+    </div>
+
+    <div class="footer">
+        © 2026 WASABI 3D. <br>국내 최대 VR 액세서리 제작자
+    </div>
+</div>
+
+<script>
+    function generateStrictQR() {
+        const qrContainer = document.getElementById('qr-area');
+        const qrcodeDiv = document.getElementById('qrcode');
+        qrcodeDiv.innerHTML = "";
+        qrContainer.style.display = "flex";
+
+        const getVal = (id) => document.getElementById(id).value || "0";
+        
+        const LS = parseFloat(getVal('LS'));
+        const LC = parseFloat(getVal('LC'));
+        const LA = parseInt(getVal('LA'));
+        const RS = parseFloat(getVal('RS'));
+        const RC = parseFloat(getVal('RC'));
+        const RA = parseInt(getVal('RA'));
+
+        // 공백 없는 엄격한 JSON 조립
+        const strictJson = '{"LS":' + LS + ',"LC":' + LC + ',"LA":' + LA + ',"RS":' + RS + ',"RC":' + RC + ',"RA":' + RA + '}';
+        const base64Str = btoa("#tB" + strictJson);
+        const finalPayload = '["I610_EL","1","' + base64Str + '"]';
+
+        new QRCode(qrcodeDiv, {
+            text: finalPayload,
+            width: 200,
+            height: 200,
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        
+        setTimeout(() => {
+            qrContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+</script>
+</body>
+</html>
