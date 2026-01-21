@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASABI - Galaxy XR Lens QR Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --wasabi: #83d644; --bg: #121212; --card: #1e1e1e; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: #fff; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        h2 { text-align: center; color: var(--wasabi); font-weight: 700; margin-bottom: 5px; }
+        .sub-title { text-align: center; font-size: 13px; color: #888; margin-bottom: 25px; }
+        .eye-section { background: #2a2a2a; padding: 18px; border-radius: 12px; margin-bottom: 15px; }
+        .eye-label { font-size: 14px; font-weight: bold; color: var(--wasabi); margin-bottom: 12px; display: block; border-left: 4px solid var(--wasabi); padding-left: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .input-box { display: flex; flex-direction: column; }
+        label { font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+        input { background: #333; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; text-align: center; font-size: 14px; }
+        input:focus { border-color: var(--wasabi); outline: none; }
+        .btn { width: 100%; padding: 16px; background: var(--wasabi); color: #000; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn:hover { background: #72ba3a; }
+        #qr-area { background: #fff; padding: 25px; border-radius: 15px; margin-top: 25px; display: none; flex-direction: column; align-items: center; }
+        #qr-area p { color: #000; font-size: 12px; margin-top: 15px; font-weight: bold; }
+        .footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>WASABI</h2>
+    <div class="sub-title">Galaxy XR Lens QR Generator</div>
+    
+    <div class="eye-section">
+        <span class="eye-label">LEFT EYE (왼쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH</label><input type="number" id="LS" step="0.25" value="0.00"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="LC" step="0.25" value="0.00"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="LA" value="180"></div>
+        </div>
+    </div>
+
+    <div class="eye-section">
+        <span class="eye-label">RIGHT EYE (오른쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH</label><input type="number" id="RS" step="0.25" value="0.00"></div>
+            <div class="input-box"><label>CYL</label><input type="number" id="RC" step="0.25" value="0.00"></div>
+            <div class="input-box"><label>AXIS</label><input type="number" id="RA" value="180"></div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="generateStrictQR()">QR 코드 생성하기</button>
+
+    <div id="qr-area">
+        <div id="qrcode"></div>
+        <p>기기의 카메라로 스캔하세요</p>
+    </div>
+
+    <div class="footer">
+        본 서비스는 갤럭시 XR 렌즈 보정을 위한 전용 규격을 준수합니다.<br>
+        데이터는 암호화(Base64)되어 기기에 전달됩니다.
+    </div>
+</div>
+
+<script>
+    function generateStrictQR() {
+        const qrContainer = document.getElementById('qr-area');
+        const qrcodeDiv = document.getElementById('qrcode');
+        qrcodeDiv.innerHTML = "";
+        qrContainer.style.display = "flex";
+
+        // 1. 값 추출 (기본값 처리)
+        const getVal = (id) => document.getElementById(id).value || "0";
+        
+        const LS = parseFloat(getVal('LS'));
+        const LC = parseFloat(getVal('LC'));
+        const LA = parseInt(getVal('LA'));
+        const RS = parseFloat(getVal('RS'));
+        const RC = parseFloat(getVal('RC'));
+        const RA = parseInt(getVal('RA'));
+
+        // 2. 엄격한 JSON 문자열 조립 (순서 및 공백 제어)
+        // 자바스크립트 객체의 불확실성을 피하기 위해 수동 조립
+        const strictJson = '{"LS":' + LS + ',"LC":' + LC + ',"LA":' + LA + ',"RS":' + RS + ',"RC":' + RC + ',"RA":' + RA + '}';
+
+        // 3. 헤더 #tB 추가 및 Base64 인코딩
+        const rawContent = "#tB" + strictJson;
+        const base64Str = btoa(rawContent);
+
+        // 4. 최종 배열 패키징 (공백 없이 구성)
+        const finalPayload = '["I610_EL","1","' + base64Str + '"]';
+
+        // 5. QR 생성
+        new QRCode(qrcodeDiv, {
+            text: finalPayload,
+            width: 200,
+            height: 200,
+            correctLevel : QRCode.CorrectLevel.H // 가장 높은 오류 정정 수준
+        });
+        
+        // 화면 하단으로 자동 스크롤
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
