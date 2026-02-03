@@ -21,8 +21,19 @@
         input:focus { border-color: var(--wasabi); background: #3d3d3d; }
         .btn { width: 100%; padding: 18px; background: var(--wasabi); color: #000; border: none; border-radius: 16px; font-size: 17px; font-weight: 800; cursor: pointer; margin-top: 10px; -webkit-tap-highlight-color: transparent; }
         .btn:active { transform: scale(0.97); background: #72ba3a; }
-        #qr-area { background: #fff; padding: 25px; border-radius: 20px; margin-top: 25px; display: none; flex-direction: column; align-items: center; }
+
+        /* QR 영역: 흰색 배경과 넉넉한 여백 확보 */
+        #qr-area { 
+            background: #ffffff; 
+            padding: 35px; /* 여백 확장 */
+            border-radius: 20px; 
+            margin-top: 25px; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center;
+        }
         #qr-area p { color: #000; font-size: 13px; margin-top: 15px; font-weight: bold; }
+        
         .guide-card { margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
         .guide-title { font-size: 15px; color: var(--wasabi); font-weight: bold; margin-bottom: 15px; text-align: left; }
         .guide-step { font-size: 13px; color: #bbb; margin-bottom: 12px; line-height: 1.6; display: flex; text-align: left; }
@@ -34,8 +45,22 @@
 <div class="container">
     <h2>WASABI 3D</h2>
     <div class="sub-title">Galaxy XR Lens QR Generator</div>
-    <div class="eye-section"><span class="eye-label">LEFT EYE (왼쪽)</span><div class="grid"><div class="input-box"><label>SPH</label><input type="number" id="LS" step="0.25" value="0.00" inputmode="decimal"></div><div class="input-box"><label>CYL</label><input type="number" id="LC" step="0.25" value="0.00" inputmode="decimal"></div><div class="input-box"><label>AXIS</label><input type="number" id="LA" value="0" inputmode="numeric"></div></div></div>
-    <div class="eye-section"><span class="eye-label">RIGHT EYE (오른쪽)</span><div class="grid"><div class="input-box"><label>SPH</label><input type="number" id="RS" step="0.25" value="0.00" inputmode="decimal"></div><div class="input-box"><label>CYL</label><input type="number" id="RC" step="0.25" value="0.00" inputmode="decimal"></div><div class="input-box"><label>AXIS</label><input type="number" id="RA" value="0" inputmode="numeric"></div></div></div>
+    <div class="eye-section">
+        <span class="eye-label">LEFT EYE (왼쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH(도수)</label><input type="number" id="LS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL(난시)</label><input type="number" id="LC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS(축)</label><input type="number" id="LA" value="0" inputmode="numeric"></div>
+        </div>
+    </div>
+    <div class="eye-section">
+        <span class="eye-label">RIGHT EYE (오른쪽)</span>
+        <div class="grid">
+            <div class="input-box"><label>SPH(도수)</label><input type="number" id="RS" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>CYL(난시)</label><input type="number" id="RC" step="0.25" value="0.00" inputmode="decimal"></div>
+            <div class="input-box"><label>AXIS(축)</label><input type="number" id="RA" value="0" inputmode="numeric"></div>
+        </div>
+    </div>
     <button class="btn" onclick="generateStrictQR()">QR 코드 생성하기</button>
     <div id="qr-area"><div id="qrcode"></div><p>카메라로 위 QR을 스캔하세요</p></div>
     <div class="guide-card">
@@ -56,16 +81,16 @@
         const LS = parseFloat(getVal('LS')), LC = parseFloat(getVal('LC')), LA = parseInt(getVal('LA'));
         const RS = parseFloat(getVal('RS')), RC = parseFloat(getVal('RC')), RA = parseInt(getVal('RA'));
 
-        // [핵심] 원본 코닥 규격: #tB 없이 공백 없는 JSON만 조립
+        // 원본 코닥 규격: 순수 JSON만 조립 (공백 제거)
         const strictJson = '{"LS":' + LS + ',"LC":' + LC + ',"LA":' + LA + ',"RS":' + RS + ',"RC":' + RC + ',"RA":' + RA + '}';
         const base64Str = btoa(strictJson);
         const finalPayload = '["I610_EL","1","' + base64Str + '"]';
 
-        // [중요] 인식률을 위해 CorrectLevel을 M으로 조정 (점이 커짐)
+        // 인식률 최적화: Level M으로 설정하여 점 크기 확보
         new QRCode(qrcodeDiv, {
             text: finalPayload,
-            width: 256,
-            height: 256,
+            width: 250,
+            height: 250,
             correctLevel : QRCode.CorrectLevel.M
         });
         setTimeout(() => { qrContainer.scrollIntoView({ behavior: 'smooth' }); }, 100);
