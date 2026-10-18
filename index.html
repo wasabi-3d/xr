@@ -48,16 +48,16 @@
     <div class="eye-section">
         <span class="eye-label">LEFT EYE (왼쪽)</span>
         <div class="grid">
-            <div class="input-box"><label>SPH(도수)</label><input type="number" id="LS" step="0.25" value="0.00" inputmode="text"></div>
-            <div class="input-box"><label>CYL(난시)</label><input type="number" id="LC" step="0.25" value="0.00" inputmode="text"></div>
+            <div class="input-box"><label>SPH(도수)</label><input type="text" id="LS" step="0.25" value="0.00" inputmode="text"></div>
+            <div class="input-box"><label>CYL(난시)</label><input type="text" id="LC" step="0.25" value="0.00" inputmode="text"></div>
             <div class="input-box"><label>AXIS(축)</label><input type="number" id="LA" value="0" inputmode="numeric"></div>
         </div>
     </div>
     <div class="eye-section">
         <span class="eye-label">RIGHT EYE (오른쪽)</span>
         <div class="grid">
-            <div class="input-box"><label>SPH(도수)</label><input type="number" id="RS" step="0.25" value="0.00" inputmode="text"></div>
-            <div class="input-box"><label>CYL(난시)</label><input type="number" id="RC" step="0.25" value="0.00" inputmode="text"></div>
+            <div class="input-box"><label>SPH(도수)</label><input type="text" id="RS" step="0.25" value="0.00" inputmode="text"></div>
+            <div class="input-box"><label>CYL(난시)</label><input type="text" id="RC" step="0.25" value="0.00" inputmode="text"></div>
             <div class="input-box"><label>AXIS(축)</label><input type="number" id="RA" value="0" inputmode="numeric"></div>
         </div>
     </div>
@@ -82,7 +82,7 @@
         const RS = parseFloat(getVal('RS')), RC = parseFloat(getVal('RC')), RA = parseInt(getVal('RA'));
 
         // 원본 코닥 규격: 순수 JSON만 조립 (공백 제거)
-        const strictJson = '{"LS":' + LS + ',"LC":' + LC + ',"LA":' + LA + ',"RS":' + RS + ',"RC":' + RC + ',"RA":' + RA + '}';
+        const strictJson = '{"LS":' + LS.toFixed(2) + ',"LC":' + LC.toFixed(2) + ',"LA":' + LA.toFixed(2) + ',"RS":' + RS.toFixed(2) + ',"RC":' + RC.toFixed(2) + ',"RA":' + RA.toFixed(2) + '}';
         const base64Str = btoa(strictJson);
         const finalPayload = '["I610_EL","1","' + base64Str + '"]';
 
